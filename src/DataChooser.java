@@ -1,5 +1,4 @@
 import java.time.*;
-
 import javax.naming.Context;
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +15,8 @@ public class DataChooser extends JFrame implements ActionListener{
 		private JButton[] dayButton;
 		private JButton[] mouthButton;
 		private JButton[] yearButton;
-		private JButton more,less,manual,confirm,next,previus;
-		private JLabel date;
+		private JButton more,less,manual,confirm,previus,next;
+		private JLabel date,prova3,prova1;
 		private Container c;
 		private CardLayout card;
 		private JButton grillDay;
@@ -57,8 +56,8 @@ public class DataChooser extends JFrame implements ActionListener{
 			less = new JButton(new ImageIcon(new ImageIcon("minus.png").getImage().getScaledInstance(15,15,Image.SCALE_DEFAULT)));
 			manual = new JButton("inserimento manuale");
 			confirm  = new JButton(new ImageIcon(new ImageIcon("check.png").getImage().getScaledInstance(15,15,Image.SCALE_DEFAULT)));
-			next  = new JButton(new ImageIcon(new ImageIcon("double-chevron_LX.png").getImage().getScaledInstance(25,135,Image.SCALE_DEFAULT)));
-			previus  = new JButton(new ImageIcon(new ImageIcon("double-chevron.png").getImage().getScaledInstance(25,135,Image.SCALE_DEFAULT)));
+			previus  = new JButton(new ImageIcon(new ImageIcon("double-chevron_LX.png").getImage().getScaledInstance(25,135,Image.SCALE_DEFAULT)));
+			next  = new JButton(new ImageIcon(new ImageIcon("double-chevron.png").getImage().getScaledInstance(25,135,Image.SCALE_DEFAULT)));
 			app = LocalDate.now();
 			date = new JLabel();
 			cont = 0;
@@ -73,9 +72,9 @@ public class DataChooser extends JFrame implements ActionListener{
 			JPanel west = new JPanel();
 			JPanel base = new JPanel();
 //			ImageIcon i = new ImageIcon();
-			JLabel prova1 = new JLabel("                            ");
+			prova1 = new JLabel("                            ");
 			JPanel prova2 = new JPanel();
-			JLabel prova3 = new JLabel("                            ");
+			prova3 = new JLabel("                            ");
 			JPanel base2 = new JPanel();
 			JPanel base3 = new JPanel();
 			prova = new JPanel();
@@ -101,7 +100,8 @@ public class DataChooser extends JFrame implements ActionListener{
 			manual.addActionListener(this);
 			more.addActionListener(this);
 			less.addActionListener(this);
-			
+			previus.addActionListener(this);
+			next.addActionListener(this);
 			
 			///////////////////////////////////\\\\\\\\\\\\\\\\\\\\\
 			center.setLayout(new GridLayout(5,7));
@@ -154,9 +154,9 @@ public class DataChooser extends JFrame implements ActionListener{
 			
 //			north.setBackground(Color.black);
 			///////////////////////////EST\\\\\\\\\\\\\\\\\\\\\\\\\
-			east.add(previus);
+			east.add(next);
 			/////////////////////////OVEST\\\\\\\\\\\\\\\\\\\\\\\\\
-			west.add(next);
+			west.add(previus);
 			/////////////////////////BASE\\\\\\\\\\\\\\\\\\\\\\\\\\
 			base.setLayout(new BorderLayout());
 			base.add(north,"North");
@@ -172,8 +172,10 @@ public class DataChooser extends JFrame implements ActionListener{
 			prova.add(center3,NAME_CARD[2]);
 			c.add(base);
 			card.show(prova,NAME_CARD[0]);
+			less.setEnabled(false);
 			
-			setDate(NAME_CARD[0]);
+			setDate();
+			setIntervalDay();
 			
 			setSize(400,250);
 			setResizable(false);
@@ -192,18 +194,38 @@ public class DataChooser extends JFrame implements ActionListener{
 //		
 //	}
 	
-	
-	private void setDate(String curren_panel){
-		String s = "";
-		if(curren_panel.compareTo(NAME_CARD[0]) == 0)
+	private void setCompletedDate(){
+		if((app.getMonthValue() == 12)||(app.getMonthValue() == 11) || (app.getMonthValue() == 9) || 
+				(app.getMonthValue() == 1) || (app.getMonthValue() == 2))
 		{
-			s =  MESI_NOMI[app.getMonthValue()-1] +"    " +  app.getYear();
+			prova1.setText("                         ");
+			prova3.setText("                         ");
 		}
-		else if(curren_panel.compareTo(NAME_CARD[1]) == 0)
+		else {
+			prova1.setText("                            ");
+			prova3.setText("                            ");
+		}
+		date.setText(app.getDayOfMonth() +" "+ MESI_NOMI[app.getMonthValue()-1] +" " +  app.getYear());
+	}
+	
+	
+	private void setDate(){
+		String s = "";
+		prova1.setText("                            ");
+		prova3.setText("                            ");
+		if(cont == 0)
+		{
+			//s =  MESI_NOMI[app.getMonthValue()-1] +"    " +  app.getYear();
+			if((app.getMonthValue() == 12)||(app.getMonthValue() == 11) || (app.getMonthValue() == 9))
+				s =  MESI_NOMI[app.getMonthValue()-1]+ " " +  app.getYear();
+			else
+				s =  MESI_NOMI[app.getMonthValue()-1] +"    " +  app.getYear();
+		}
+		else if(cont == 1)
 		{
 			s =  app.getDayOfMonth() +"                 " +  app.getYear();
 		}
-		else if(curren_panel.compareTo(NAME_CARD[2]) == 0)
+		else if(cont== 2)
 		{
 			s =+ app.getDayOfMonth() + "         " + MESI_NOMI[app.getMonthValue()-1] ;	
 		}
@@ -216,6 +238,37 @@ public class DataChooser extends JFrame implements ActionListener{
 			Integer z = app.getYear() - (15-i);
 			yearButton[i].setText(z.toString());
 		}
+	}
+	
+	private void setIntervalDay()
+	{
+		int numMouth = app.getMonthValue() -1;
+		if(app.getYear() % 4 == 0)
+		{
+			for(int i = 0; i < dayButton.length; i++) {
+				if(i<GIORNI_ANNO_BISESTILE[numMouth]) {
+					dayButton[i].setVisible(true);
+				}
+				else
+				{
+					dayButton[i].setVisible(false);
+				}
+			}
+		}
+		else
+		{
+			for(int i = 0; i < dayButton.length; i++) {
+				if(i<GIORNI_ANNO[numMouth]) {
+					dayButton[i].setVisible(true);
+				}
+				else
+				{
+					dayButton[i].setVisible(false);
+				}
+			}
+		}
+			
+		
 	}
 	
 	public static LocalDate chooser() {
@@ -253,7 +306,7 @@ public void actionPerformed(ActionEvent e) {
 			more.setEnabled(true);
 		}
 		card.show(prova,NAME_CARD[cont]);
-		setDate(NAME_CARD[cont]);
+		setDate();
 	}
 	else if(o == less)
 	{
@@ -269,7 +322,93 @@ public void actionPerformed(ActionEvent e) {
 			more.setEnabled(true);
 		}
 		card.show(prova,NAME_CARD[cont]);
-		setDate(NAME_CARD[cont]);
+		setDate();
+	}
+	else if(o == next)
+	{
+		if(cont == 2)
+		{
+			//app = new LocalDate(app.getDayOfMonth(),app.getMonthValue(),app.getYear()+15);
+			int a = app.getYear();
+			app = app.withYear(a +15);
+			setIntervalYear();
+		}
+		else if(cont == 1)
+		{
+			int a = app.getYear();
+			app = app.withYear(a +1);
+			setDate();
+		}
+		else if(cont == 0)
+		{
+			int a = ((app.getMonthValue() + 1)%12);
+			if(a == 0)
+			{
+				a = 12;
+			}
+			if(a == 1)
+			{
+				app = app.withYear(app.getYear()+1);
+			}
+			app = app.withMonth(a);
+			setIntervalDay();
+			setDate();
+		}
+	}
+	else if(o == previus)
+	{
+		if(cont == 2)
+		{
+			//app = new LocalDate(app.getDayOfMonth(),app.getMonthValue(),app.getYear()+15);
+			int a = app.getYear();
+			app = app.withYear(a -15);
+			setIntervalYear();
+		}
+		else if(cont == 1)
+		{
+			int a = app.getYear();
+			app = app.withYear(a -1);
+			setDate();
+		}
+		else if(cont == 0)
+		{
+			int a = ((app.getMonthValue() - 1)%12);
+			if(a == 0)
+			{
+				a = 12;
+				app = app.withYear(app.getYear()-1);
+			}
+			app = app.withMonth(a);
+			setIntervalDay();
+			setDate();
+		}
+	}
+	else if(cont == 1)
+	{
+		for(int i = 0; i < 12; i++)
+			if(o == mouthButton[i])
+			{
+				app = app.withMonth(i+1);
+				setCompletedDate();
+			}
+	}
+	else if(cont == 0)
+	{
+		for(int i = 0; i < 31; i++)
+			if(o == dayButton[i])
+			{
+				app = app.withDayOfMonth(i+1);
+				setCompletedDate();
+			}
+	}
+	else if(cont == 2) 
+	{
+		for(int i = 0; i < 15; i++)
+			if(o == yearButton[i])
+			{
+				app = app.withYear(Integer.parseInt(yearButton[i].getText()));
+				setCompletedDate();
+			}
 	}
 }
 
