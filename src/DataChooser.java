@@ -1,4 +1,6 @@
 import java.time.*;
+import java.util.concurrent.ExecutionException;
+
 import javax.naming.Context;
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +26,7 @@ public class DataChooser extends JFrame implements ActionListener{
 		private int cont;
 		private Thread t;
 		private JPanel prova;
-		
+    	
 		
 		public DataChooser() {
 			// TODO Auto-generated constructor stub
@@ -180,12 +182,19 @@ public class DataChooser extends JFrame implements ActionListener{
 			setSize(400,250);
 			setResizable(false);
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
+			t.start();
+			try {
+				t.wait();
+			}
+			catch(Exception e) {
+				System.out.println("exception "+ e);
+			}
 		}
 		
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		DataChooser.chooser();
+		System.out.println(DataChooser.chooser());
 	}
 
 //	@Override
@@ -274,6 +283,15 @@ public class DataChooser extends JFrame implements ActionListener{
 	public static LocalDate chooser() {
 		DataChooser x = new DataChooser();
 		x.setVisible(true);
+		Thread t2 = new Thread();
+		try
+		{
+			t2.join();
+		}
+		catch(Exception e )
+		{
+			System.out.println("exception "+e);
+		}
 		return x.getApp();
 	
 	}
@@ -290,6 +308,7 @@ public void actionPerformed(ActionEvent e) {
 	// TODO Auto-generated method stub
 	Object o = e.getSource();
 	if(o == confirm) {
+		t.interrupt();
 		System.out.println("hai cliccato qui");
 	}
 	else if(o == more)
@@ -324,7 +343,7 @@ public void actionPerformed(ActionEvent e) {
 		card.show(prova,NAME_CARD[cont]);
 		setDate();
 	}
-	else if(o == next)
+	else if(o == next)     	 
 	{
 		if(cont == 2)
 		{
@@ -354,7 +373,7 @@ public void actionPerformed(ActionEvent e) {
 			setIntervalDay();
 			setDate();
 		}
-	}
+	}	
 	else if(o == previus)
 	{
 		if(cont == 2)
@@ -391,8 +410,8 @@ public void actionPerformed(ActionEvent e) {
 				app = app.withMonth(i+1);
 				setCompletedDate();
 			}
-	}
-	else if(cont == 0)
+	}	
+	else if(cont == 0)	
 	{
 		for(int i = 0; i < 31; i++)
 			if(o == dayButton[i])
