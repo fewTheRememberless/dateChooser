@@ -2,12 +2,13 @@ import java.time.*;
 import java.util.concurrent.ExecutionException;
 
 import javax.naming.Context;
+import javax.sound.midi.Synthesizer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 
-public class DataChooser extends JFrame implements ActionListener{
+public class DataChooser extends JFrame implements ActionListener,Runnable{
 	
 		static int[] GIORNI_ANNO = {31,28,31,30,31,30,31,31,30,31,30,31};
 		static int[] GIORNI_ANNO_BISESTILE = {31,29,31,30,31,30,31,31,30,31,30,31};
@@ -31,11 +32,10 @@ public class DataChooser extends JFrame implements ActionListener{
 		public DataChooser() {
 			// TODO Auto-generated constructor stub
 			super("scelta data");
-			t = new Thread(Thread.currentThread());
-			t.setName("prova thread");
 			dayButton = new JButton[31];
 			mouthButton = new JButton[12];
 			yearButton= new JButton[15];
+			t = Thread.currentThread();
 			for(int i = 0; i < 31;i++) {
 				dayButton[i] = new JButton();
 				dayButton[i].setMargin(new Insets(5,5,10,10));
@@ -179,10 +179,11 @@ public class DataChooser extends JFrame implements ActionListener{
 			setDate();
 			setIntervalDay();
 			
+			setVisible(true);
 			setSize(400,250);
 			setResizable(false);
 			setDefaultCloseOperation(EXIT_ON_CLOSE);
-			t.start();
+			
 			try {
 				t.wait();
 			}
@@ -197,11 +198,17 @@ public class DataChooser extends JFrame implements ActionListener{
 		System.out.println(DataChooser.chooser());
 	}
 
-//	@Override
-//	public void actionPerformed(ActionEvent e) {
-//		// TODO Auto-generated method stub
-//		
-//	}
+
+	public void setThread(Thread t)
+	{
+		try {
+			t.wait();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
+	
 	
 	private void setCompletedDate(){
 		if((app.getMonthValue() == 12)||(app.getMonthValue() == 11) || (app.getMonthValue() == 9) || 
@@ -282,16 +289,6 @@ public class DataChooser extends JFrame implements ActionListener{
 	
 	public static LocalDate chooser() {
 		DataChooser x = new DataChooser();
-		x.setVisible(true);
-		Thread t2 = new Thread();
-		try
-		{
-			t2.join();
-		}
-		catch(Exception e )
-		{
-			System.out.println("exception "+e);
-		}
 		return x.getApp();
 	
 	}
@@ -429,6 +426,20 @@ public void actionPerformed(ActionEvent e) {
 				setCompletedDate();
 			}
 	}
+}
+
+
+@Override
+public void run() {
+	// TODO Auto-generated method stub
+	synchronized(this) {
+		try {
+			wait();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
 }
 
 
