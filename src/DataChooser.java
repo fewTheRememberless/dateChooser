@@ -1,8 +1,7 @@
 import java.time.*;
-import java.util.concurrent.ExecutionException;
-
-import javax.naming.Context;
-import javax.sound.midi.Synthesizer;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.lang.Object.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -28,7 +27,7 @@ public class DataChooser extends JFrame implements ActionListener, Runnable {
 	private JPanel prova;
 	private boolean exit;
 
-	public DataChooser() {
+	protected DataChooser() {
 		// TODO Auto-generated constructor stub
 		super("scelta data");
 		dayButton = new JButton[31];
@@ -108,6 +107,7 @@ public class DataChooser extends JFrame implements ActionListener, Runnable {
 		less.addActionListener(this);
 		previus.addActionListener(this);
 		next.addActionListener(this);
+		manual.addActionListener(this);
 
 		/////////////////////////////////// \\\\\\\\\\\\\\\\\\\\\
 		center.setLayout(new GridLayout(5, 7));
@@ -202,7 +202,7 @@ public class DataChooser extends JFrame implements ActionListener, Runnable {
 		System.out.println(DataChooser.chooser());
 	}
 
-//	public void setThread(Thread t)
+//	protected void setThread(Thread t)
 //	{
 //		try {
 //			t.wait();
@@ -354,8 +354,17 @@ public class DataChooser extends JFrame implements ActionListener, Runnable {
 				app = app.withMonth(a);
 				setIntervalDay();
 				setDate();
-			}
-		} else if (cont == 1) {
+			} 
+		}
+		else if (o == manual) {
+			String s = JOptionPane.showInputDialog("inserisci una data rispettando la formattazione gg/mm/aaaa");
+			if (isValid(s))
+				app = manualDate(s);
+			else
+				JOptionPane.showMessageDialog(null, "data errata, riprovare");
+		}
+		
+		else if (cont == 1) {
 			for (int i = 0; i < 12; i++)
 				if (o == mouthButton[i]) {
 					app = app.withMonth(i + 1);
@@ -374,6 +383,23 @@ public class DataChooser extends JFrame implements ActionListener, Runnable {
 					setCompletedDate();
 				}
 		}
+	}
+
+	protected LocalDate manualDate(String s) {
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		return LocalDate.parse(s, f);
+
+	}
+
+	protected boolean isValid(String s) {
+		DateTimeFormatter f = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		try {
+			System.out.println(LocalDate.parse(s, f));
+		} catch (DateTimeParseException e) {
+			// TODO: handle exception
+			return false;
+		}
+		return true;
 	}
 
 	@Override
